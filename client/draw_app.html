@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"
+    <title>
+        Draw Quiz
+    </title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="draw_app.css">
+</head>
+
+<h1>Draw Your Object</h1>
+<canvas id="myCanvas" width="560" height="360"></canvas>
+
+<div>
+    <label for="brushPalette">Brush Color</label>
+    <input type="color" id="brushPalette" value="#000000">
+</div>
+
+<div>
+    <label for="brushSlider">Brush Size</label>
+    <input type="range" min="1" max="50" value="5" id="brushSlider">
+</div>
+
+<div>
+    <button type="button" id="clearButton">Clear</button>
+    <button type="submit" id="submitButton">Submit</button>
+</div>
+
+<script src="draw_app.js"></script>
+
+</html>
