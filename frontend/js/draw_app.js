@@ -5,6 +5,21 @@ socket.onopen = () => {
     socket.send("Hello from the client!");
 };
 
+socket.onmessage = (msg) => {
+    let data = JSON.parse(msg.data);
+    /*
+    console.log(data.Body);
+    let image  = new Image();
+    image.src = data.Body;
+    context.drawImage(image, 0, 0);
+    */
+    var image = new Image();
+    image.onload = function() {
+      context.drawImage(image, 0, 0);
+    };
+    image.src = data.Body
+}
+
 socket.onclose = (event) => {
     console.log("Socket Closed Connection: ", event);
 };
@@ -17,20 +32,23 @@ let isDrawing = false;
 let x = 0;
 let y = 0;
 
-const myCanvas = document.getElementById("myCanvas");
-const context = myCanvas.getContext("2d");
+const canvas = document.getElementById("myCanvas");
+const context = canvas.getContext("2d");
 const brushPalette = document.getElementById("brushPalette");
 const brushSlider = document.getElementById("brushSlider");
 const clearButton = document.getElementById("clearButton");
 const submitButton = document.getElementById("submitButton");
 
-myCanvas.addEventListener("mousedown", e => {
+context.fillStyle = "white";
+context.fillRect(0, 0, canvas.width, canvas.height);
+
+canvas.addEventListener("mousedown", e => {
     x = e.offsetX;
     y = e.offsetY;
     isDrawing = true;
 });
 
-myCanvas.addEventListener("mousemove", e => {
+canvas.addEventListener("mousemove", e => {
     if (isDrawing === true) {
         drawLine(context, x, y, e.offsetX, e.offsetY);
         x = e.offsetX;
@@ -60,11 +78,12 @@ function drawLine(context, x1, y1, x2, y2) {
 
 
 clearButton.addEventListener("click", e => {
-    context.clearRect(0, 0, myCanvas.width, myCanvas.height);
+    context.fillStyle = "white";
+    context.fillRect(0, 0, canvas.width, canvas.height);
 });
 
 
 submitButton.addEventListener("click", e => {
-    let drawing = context.getImageData(0, 0, myCanvas.width/2, myCanvas.height);
-    context.putImageData(drawing, myCanvas.width/2, 0);
+    let drawing = canvas.toDataURL("image/jpeg");
+    socket.send(drawing);
 });
