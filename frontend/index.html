@@ -1,7 +1,9 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <meta charset="utf-8"
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>
         Draw Quiz!
     </title>
@@ -11,8 +13,12 @@
 
 <form action="draw_app.html" method="GET">
     <div>
-        <label for="name">Name</label>
-        <input type="text" name="name" id="name">
+        <label for="userName">Name</label>
+        <input type="text" name="userName" id="userName" required>
+    </div>
+    <div>
+        <label for="roomID">Room ID</label>
+        <input type="text" name="roomID" id="roomID" required>
     </div>
     <button type="submit">Start</button>
 </form>
