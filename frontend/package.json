@@ -1,9 +1,0 @@
-{
-    "name": "first-app",
-    "version": "1.0.0",
-    "description": "example for blog",
-    "main": "index.js",
-    "scripts": {
-        "start": "node server.js"
-    }
-}

@@ -26,16 +26,29 @@ func serveWS(pool *websocket.Pool, w http.ResponseWriter, r *http.Request) {
 	client.Read()
 }
 
-func setupRoutes() {
+func setupRoutes() *http.ServeMux {
+	webServerMux := http.NewServeMux()
 	pool := websocket.NewPool()
 	go pool.Start()
-	http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
+	webServerMux.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
 		serveWS(pool, w, r)
 	})
+	return webServerMux
+}
+
+func handleHome(w http.ResponseWriter, r *http.Request) {
+	http.ServeFile(w, r, "index.html")
+}
+
+func handleRoom(w http.ResponseWriter, r *http.Request) {
+	http.ServeFile(w, r, "draw_app.html")
 }
 
 func main() {
-	fmt.Println("Draw App Server Starting...")
-	setupRoutes()
-	http.ListenAndServe(":8080", nil)
+	webServerMux := setupRoutes()
+	webServerMux.HandleFunc("/", handleHome)
+	webServerMux.HandleFunc("/room", handleRoom)
+
+	fmt.Println("Draw App Web Server Starting...")
+	http.ListenAndServe(":8080", webServerMux)
 }
