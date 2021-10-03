@@ -11,22 +11,9 @@
 </head>
 
 <h2 id="welcomeMess"></h2> 
-<script>
-    const welcomMess = document.getElementById("welcomeMess");
-    var userName
-    var roomID
-    new URLSearchParams(window.location.search).forEach((value, name) => {
-        if (name == "userName") {
-            userName = value
-        } else if  (name == "roomID") {
-            roomID = value
-        }
-    });
-    welcomeMess.append(`Welcome to room ${roomID} ${userName}!`)
-</script>
 
 <h1>Draw Your Object</h1>
-<canvas id="myCanvas" width="560" height="360"></canvas>
+<canvas id="myCanvas" width="560" height="360" style="border: 1px solid black;"></canvas>
 
 <div>
     <label for="brushPalette">Brush Color</label>
@@ -47,6 +34,108 @@
     <button>Back to Lobby</button>
 </a>
 
-<script src="js/draw_app.js"></script>
+<script>
+    const welcomMess = document.getElementById("welcomeMess");
+    var userName
+    var roomID
+    new URLSearchParams(window.location.search).forEach((value, name) => {
+        if (name == "userName") {
+            userName = value
+        } else if  (name == "roomID") {
+            roomID = value
+        }
+    });
+    welcomeMess.append(`Welcome to room ${roomID} ${userName}!`)
+
+    let socket = new WebSocket("ws://localhost:8080/ws");
+
+    socket.onopen = () => {
+        console.log("Connected to Server");
+        socket.send("Hello from the client!");
+    };
+
+    socket.onmessage = (msg) => {
+        let data = JSON.parse(msg.data);
+        /*
+        console.log(data.Body);
+        let image  = new Image();
+        image.src = data.Body;
+        context.drawImage(image, 0, 0);
+        */
+        var image = new Image();
+        image.onload = function() {
+        context.drawImage(image, 0, 0);
+        };
+        image.src = data.Body
+    }
+
+    socket.onclose = (event) => {
+        console.log("Socket Closed Connection: ", event);
+    };
+
+    socket.onerror = (error) => {
+        console.log("Socket Error: ", error);
+    };
+
+    let isDrawing = false;
+    let x = 0;
+    let y = 0;
+
+    const canvas = document.getElementById("myCanvas");
+    const context = canvas.getContext("2d");
+    const brushPalette = document.getElementById("brushPalette");
+    const brushSlider = document.getElementById("brushSlider");
+    const clearButton = document.getElementById("clearButton");
+    const submitButton = document.getElementById("submitButton");
+
+    context.fillStyle = "white";
+    context.fillRect(0, 0, canvas.width, canvas.height);
+
+    canvas.addEventListener("mousedown", e => {
+        x = e.offsetX;
+        y = e.offsetY;
+        isDrawing = true;
+    });
+
+    canvas.addEventListener("mousemove", e => {
+        if (isDrawing === true) {
+            drawLine(context, x, y, e.offsetX, e.offsetY);
+            x = e.offsetX;
+            y = e.offsetY;
+        }
+    });
+
+    window.addEventListener("mouseup", e => {
+        if (isDrawing === true) {
+            drawLine(context, x, y, e.offsetX, e.offsetY);
+            x = 0;
+            y = 0;
+            isDrawing = false;
+        }
+    });
+
+    function drawLine(context, x1, y1, x2, y2) {
+        context.beginPath();
+        context.strokeStyle = brushPalette.value;
+        context.lineWidth = brushSlider.value;
+        context.lineCap = "round";
+        context.moveTo(x1, y1);
+        context.lineTo(x2, y2);
+        context.stroke();
+        context.closePath();
+    }
+
+
+    clearButton.addEventListener("click", e => {
+        context.fillStyle = "white";
+        context.fillRect(0, 0, canvas.width, canvas.height);
+    });
+
+
+    submitButton.addEventListener("click", e => {
+        let drawing = canvas.toDataURL("image/jpeg");
+        socket.send(drawing);
+    });
+</script>
 
 </html>
