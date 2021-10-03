@@ -7,7 +7,6 @@
     <title>
         Draw Quiz
     </title>
-    <link rel="stylesheet" href="css/draw_app.css">
 </head>
 
 <h2 id="welcomeMess"></h2> 
@@ -47,7 +46,7 @@
     });
     welcomeMess.append(`Welcome to room ${roomID} ${userName}!`)
 
-    let socket = new WebSocket("ws://localhost:8080/ws");
+    let socket = new WebSocket(`ws://localhost:8080/room/${roomID}`);
 
     socket.onopen = () => {
         console.log("Connected to Server");

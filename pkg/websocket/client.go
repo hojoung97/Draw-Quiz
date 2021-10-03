@@ -10,7 +10,7 @@ import (
 type Client struct {
 	ID   string
 	Conn *websocket.Conn
-	Pool *Pool
+	Hub  *Hub
 }
 
 type Message struct {
@@ -20,7 +20,7 @@ type Message struct {
 
 func (c *Client) Read() {
 	defer func() {
-		c.Pool.Unregister <- c
+		c.Hub.Unregister <- c
 		c.Conn.Close()
 	}()
 
@@ -31,7 +31,7 @@ func (c *Client) Read() {
 			return
 		}
 		message := Message{Type: messageType, Body: string(p)}
-		c.Pool.Broadcast <- message
+		c.Hub.Broadcast <- message
 		fmt.Printf("Message Received: %+v\n", message)
 	}
 }
