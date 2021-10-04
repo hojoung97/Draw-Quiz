@@ -1,7 +1,6 @@
 package websocket
 
 import (
-	"fmt"
 	"log"
 
 	"github.com/gorilla/websocket"
@@ -14,8 +13,8 @@ type Client struct {
 }
 
 type Message struct {
-	Type int    `json: type`
-	Body string `json: body`
+	Type int    `json:"type"`
+	Body string `json:"body"`
 }
 
 func (c *Client) Read() {
@@ -27,11 +26,11 @@ func (c *Client) Read() {
 	for {
 		messageType, p, err := c.Conn.ReadMessage()
 		if err != nil {
-			log.Println(err)
+			log.Printf("Fail to read client %s's message: %v\n", c.ID, err)
 			return
 		}
 		message := Message{Type: messageType, Body: string(p)}
 		c.Hub.Broadcast <- message
-		fmt.Printf("Message Received: %+v\n", message)
+		// log.Printf("Message Received: %+v\n", message)
 	}
 }

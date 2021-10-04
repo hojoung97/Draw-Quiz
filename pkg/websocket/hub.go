@@ -1,16 +1,21 @@
 package websocket
 
-import "fmt"
+import (
+	"fmt"
+	"log"
+)
 
 type Hub struct {
+	RoomID     int
 	Clients    map[*Client]bool
 	Broadcast  chan Message
 	Register   chan *Client
 	Unregister chan *Client
 }
 
-func NewHub() *Hub {
+func NewHub(roomID int) *Hub {
 	return &Hub{
+		RoomID:     roomID,
 		Clients:    make(map[*Client]bool),
 		Broadcast:  make(chan Message),
 		Register:   make(chan *Client),
@@ -23,23 +28,21 @@ func (hub *Hub) Start() {
 		select {
 		case client := <-hub.Register:
 			hub.Clients[client] = true
-			fmt.Println("Size of Connection Hub: ", len(hub.Clients))
+			log.Printf("New Client %s joined room %d (size=%d)\n", client.ID, hub.RoomID, len(hub.Clients))
 			for client := range hub.Clients {
-				fmt.Println(client)
-				client.Conn.WriteJSON(Message{Type: 1, Body: "New User Joined"})
+				client.Conn.WriteJSON(Message{Type: 1, Body: fmt.Sprintf("New User %s Joined", client.ID)})
 			}
 		case client := <-hub.Unregister:
 			delete(hub.Clients, client)
-			fmt.Println("Size of Connection Hub: ", len(hub.Clients))
+			log.Printf("New Client %s left room %d (size=%d)\n", client.ID, hub.RoomID, len(hub.Clients))
 			for client := range hub.Clients {
-				client.Conn.WriteJSON(Message{Type: 1, Body: "User Disconnected"})
+				client.Conn.WriteJSON(Message{Type: 1, Body: fmt.Sprintf("User %s Disconnected", client.ID)})
 			}
 		case message := <-hub.Broadcast:
-			fmt.Println("Sending message to all clients in hub")
+			// log.Printf("Sending message to all clients in hub %d\n", hub.RoomID)
 			for client := range hub.Clients {
 				if err := client.Conn.WriteJSON(message); err != nil {
-					fmt.Println(err)
-					return
+					log.Printf("Fail in hub %d broadcast to user %s: %v\n", hub.RoomID, client.ID, err)
 				}
 			}
 		}
