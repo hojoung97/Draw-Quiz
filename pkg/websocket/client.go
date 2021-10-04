@@ -31,6 +31,6 @@ func (c *Client) Read() {
 		}
 		message := Message{Type: messageType, Body: string(p)}
 		c.Hub.Broadcast <- message
-		// log.Printf("Message Received: %+v\n", message)
+		//log.Printf("Message Received: %+v\n", message)
 	}
 }

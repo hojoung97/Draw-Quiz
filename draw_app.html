@@ -26,17 +26,17 @@
 
 <div>
     <button type="button" id="clearButton">Clear</button>
-    <button id="submitButton">Send</button>
+    <button type="button" id="submitButton">Send</button>
 </div>
 
-<a href="index.html">
+<a href="/">
     <button>Back to Lobby</button>
 </a>
 
 <script>
     const welcomMess = document.getElementById("welcomeMess");
-    var userName
-    var roomID
+    let userName
+    let roomID
     new URLSearchParams(window.location.search).forEach((value, name) => {
         if (name == "userName") {
             userName = value
@@ -50,22 +50,19 @@
 
     socket.onopen = () => {
         console.log("Connected to Server");
-        socket.send("Hello from the client!");
     };
 
     socket.onmessage = (msg) => {
         let data = JSON.parse(msg.data);
-        /*
-        console.log(data.Body);
-        let image  = new Image();
-        image.src = data.Body;
-        context.drawImage(image, 0, 0);
-        */
-        var image = new Image();
-        image.onload = function() {
-        context.drawImage(image, 0, 0);
-        };
-        image.src = data.Body
+        if (data.type == 1) {
+            console.log(data.body)
+        } else if (data.type == 2) {
+            let image = new Image();
+            image.onload = function() {
+                context.drawImage(image, 0, 0);
+            };
+            image.src = data.body
+        }
     }
 
     socket.onclose = (event) => {
@@ -133,7 +130,8 @@
 
     submitButton.addEventListener("click", e => {
         let drawing = canvas.toDataURL("image/jpeg");
-        socket.send(drawing);
+        let enc = new TextEncoder()
+        socket.send(enc.encode(drawing));
     });
 </script>
 

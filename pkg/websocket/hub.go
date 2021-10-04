@@ -24,6 +24,12 @@ func NewHub(roomID int) *Hub {
 }
 
 func (hub *Hub) Start() {
+	defer func() {
+		close(hub.Broadcast)
+		close(hub.Register)
+		close(hub.Unregister)
+	}()
+
 	for {
 		select {
 		case client := <-hub.Register:
