@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>
+        Draw Quiz
+    </title>
+    <link rel="stylesheet" href="css/draw_app.css">
+</head>
+
+<h2 id="welcomeMess"></h2> 
+
+<h1>Draw Your Object</h1>
+<div align="center">
+    <canvas id="myCanvas" width="560" height="360"></canvas>
+    <textarea rows="23" cols="30" readonly style="resize: none; vertical-align: top;"></textarea>
+</div>
+
+<div>
+    <label for="brushPalette">Brush Color</label>
+    <input type="color" id="brushPalette" value="#000000">
+</div>
+
+<div>
+    <label for="brushSlider">Brush Size</label>
+    <input type="range" min="1" max="50" value="5" id="brushSlider">
+</div>
+
+<div>
+    <button type="button" id="clearButton">Clear</button>
+    <button type="button" id="submitButton">Send</button>
+</div>
+
+<a href="/">
+    <button>Back to Lobby</button>
+</a>
+
+<script src="js/draw_app.js"></script>
+
+</html>

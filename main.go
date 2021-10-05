@@ -44,10 +44,6 @@ func handleWS(w http.ResponseWriter, r *http.Request) {
 	client.Read()
 }
 
-func handleHome(w http.ResponseWriter, r *http.Request) {
-	http.ServeFile(w, r, "index.html")
-}
-
 func handleRoom(w http.ResponseWriter, r *http.Request) {
 	query := r.URL.Query()
 	roomID, err := strconv.Atoi(query.Get("roomID"))
@@ -61,7 +57,7 @@ func handleRoom(w http.ResponseWriter, r *http.Request) {
 	if hub, ok := hubs[roomID]; !ok || hub == nil {
 		setupWS(roomID)
 	}
-	http.ServeFile(w, r, "draw_app.html")
+	http.ServeFile(w, r, "static/draw_app.html")
 }
 
 func main() {
@@ -69,9 +65,9 @@ func main() {
 
 	webServerMux := mux.NewRouter()
 
-	webServerMux.HandleFunc("/", handleHome)
 	webServerMux.HandleFunc("/room", handleRoom).Methods("GET")
 	webServerMux.HandleFunc("/room/{roomID:[0-9]+}", handleWS)
+	webServerMux.PathPrefix("/").Handler(http.FileServer(http.Dir("./static")))
 
 	// TODO: Make port as a configurable parameter
 	log.Printf("Draw App Web Server Listening on localhost%s\n", ":8080")

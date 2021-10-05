@@ -1,23 +1,32 @@
-let socket = new WebSocket("ws://localhost:8080/ws");
+const welcomMess = document.getElementById("welcomeMess");
+let userName
+let roomID
+new URLSearchParams(window.location.search).forEach((value, name) => {
+    if (name == "userName") {
+        userName = value
+    } else if  (name == "roomID") {
+        roomID = value
+    }
+});
+welcomeMess.append(`Welcome to room ${roomID} ${userName}!`)
+
+let socket = new WebSocket(`ws://localhost:8080/room/${roomID}`);
 
 socket.onopen = () => {
     console.log("Connected to Server");
-    socket.send("Hello from the client!");
 };
 
 socket.onmessage = (msg) => {
     let data = JSON.parse(msg.data);
-    /*
-    console.log(data.Body);
-    let image  = new Image();
-    image.src = data.Body;
-    context.drawImage(image, 0, 0);
-    */
-    var image = new Image();
-    image.onload = function() {
-      context.drawImage(image, 0, 0);
-    };
-    image.src = data.Body
+    if (data.type == 1) {
+        console.log(data.body)
+    } else if (data.type == 2) {
+        let image = new Image();
+        image.onload = function() {
+            context.drawImage(image, 0, 0);
+        };
+        image.src = data.body
+    }
 }
 
 socket.onclose = (event) => {
@@ -85,5 +94,6 @@ clearButton.addEventListener("click", e => {
 
 submitButton.addEventListener("click", e => {
     let drawing = canvas.toDataURL("image/jpeg");
-    socket.send(drawing);
+    let enc = new TextEncoder()
+    socket.send(enc.encode(drawing));
 });
