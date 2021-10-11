@@ -11,13 +11,35 @@
 </head>
 
 <h2 id="welcomeMess"></h2> 
-
 <h1>Draw Your Object</h1>
-<div align="center">
-    <canvas id="myCanvas" width="560" height="360"></canvas>
-    <textarea rows="23" cols="30" readonly style="resize: none; vertical-align: top;"></textarea>
+
+<div class="selectionBox">
+    <header class="selectionBoxHeader">
+        <div class="title">Choose Object to Draw</div>
+    </header>
+    <section>
+        <div class="optionList">
+            <div class="option">
+                <span>option1</span>
+            </div>
+            <div class="option">
+                <span>option1</span>
+            </div>
+            <div class="option">
+                <span>option1</span>
+            </div>
+            <div class="option">
+                <span>option1</span>
+            </div>
+        </div>
+    </section>
+    <footer>
+        <button class="selectionButton">Start</button>
+    </footer>
 </div>
 
+
+<canvas id="myCanvas" width="700" height="700"></canvas>
 <div>
     <label for="brushPalette">Brush Color</label>
     <input type="color" id="brushPalette" value="#000000">

@@ -7,20 +7,22 @@
     <title>
         Draw Quiz!
     </title>
+    <link rel="stylesheet" href="css/index.css">
 </head>
-
-<h1>Welcome to Draw Quiz</h1>
-
-<form action="/room" method="GET">
-    <div>
-        <label for="userName">Name</label>
-        <input type="text" name="userName" id="userName" required>
+<body>
+    <div class="joinForm">
+        <h1>Draw Quiz</h1>
+        <form action="/room" method="GET">
+            <div>
+                <label for="userName">Name</label>
+                <input type="text" name="userName" id="userName" required>
+            </div>
+            <div>
+                <label for="roomID">Room ID</label>
+                <input type="text" name="roomID" id="roomID" required>
+            </div>
+            <button class="startButton" type="submit">Start</button>
+        </form>
     </div>
-    <div>
-        <label for="roomID">Room ID</label>
-        <input type="text" name="roomID" id="roomID" required>
-    </div>
-    <button type="submit">Start</button>
-</form>
-
+</body>
 </html>
