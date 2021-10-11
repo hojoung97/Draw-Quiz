@@ -1,4 +1,7 @@
-const welcomMess = document.getElementById("welcomeMess");
+/*
+Websocket code
+*/
+const welcomeMess = document.getElementById("welcomeMess");
 let userName
 let roomID
 new URLSearchParams(window.location.search).forEach((value, name) => {
@@ -37,6 +40,9 @@ socket.onerror = (error) => {
     console.log("Socket Error: ", error);
 };
 
+/*
+Canvas Code
+*/
 let isDrawing = false;
 let x = 0;
 let y = 0;
@@ -59,7 +65,7 @@ canvas.addEventListener("mousedown", e => {
 
 canvas.addEventListener("mousemove", e => {
     if (isDrawing === true) {
-        drawLine(context, x, y, e.offsetX, e.offsetY);
+        drawLine(x, y, e.offsetX, e.offsetY);
         x = e.offsetX;
         y = e.offsetY;
     }
@@ -67,14 +73,33 @@ canvas.addEventListener("mousemove", e => {
 
 window.addEventListener("mouseup", e => {
     if (isDrawing === true) {
-        drawLine(context, x, y, e.offsetX, e.offsetY);
+        drawLine(x, y, e.offsetX, e.offsetY);
         x = 0;
         y = 0;
         isDrawing = false;
+        broadcastDrawing();
     }
 });
 
-function drawLine(context, x1, y1, x2, y2) {
+clearButton.addEventListener("click", e => {
+    context.fillStyle = "white";
+    context.fillRect(0, 0, canvas.width, canvas.height);
+    broadcastDrawing();
+});
+
+submitButton.addEventListener("click", e => {
+    let drawing = canvas.toDataURL("image/jpeg");
+    let enc = new TextEncoder()
+    socket.send(enc.encode(drawing));
+});
+
+function broadcastDrawing() {
+    let drawing = canvas.toDataURL("image/jpeg");
+    let enc = new TextEncoder();
+    socket.send(enc.encode(drawing));
+}
+
+function drawLine(x1, y1, x2, y2) {
     context.beginPath();
     context.strokeStyle = brushPalette.value;
     context.lineWidth = brushSlider.value;
@@ -84,16 +109,3 @@ function drawLine(context, x1, y1, x2, y2) {
     context.stroke();
     context.closePath();
 }
-
-
-clearButton.addEventListener("click", e => {
-    context.fillStyle = "white";
-    context.fillRect(0, 0, canvas.width, canvas.height);
-});
-
-
-submitButton.addEventListener("click", e => {
-    let drawing = canvas.toDataURL("image/jpeg");
-    let enc = new TextEncoder()
-    socket.send(enc.encode(drawing));
-});
