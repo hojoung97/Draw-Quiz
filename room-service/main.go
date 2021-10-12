@@ -19,19 +19,25 @@ func setupWS(roomID int) {
 func handleWS(w http.ResponseWriter, r *http.Request) {
 	log.Printf("Websocket Endpoint Hit: %s%s\n", r.Host, r.URL.Path)
 
-	// Upgrade the connection to a WebSocket connection
-	conn, err := websocket.Upgrade(w, r)
+	vars := mux.Vars(r)
+	roomID, err := strconv.Atoi(vars["roomID"])
 	if err != nil {
-		log.Printf("Fail to upgrade the connection (handleWS): %v\n", err)
+		log.Printf("Fail to convert the roomID to int (handleWS): %v\n", err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
-	vars := mux.Vars(r)
+	if _, ok := hubs[roomID]; !ok {
+		setupWS(roomID)
+	} else if len(hubs[roomID].Clients) >= 2 {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
 
-	roomID, err := strconv.Atoi(vars["roomID"])
+	// Upgrade the connection to a WebSocket connection
+	conn, err := websocket.Upgrade(w, r)
 	if err != nil {
-		log.Printf("Fail to convert the roomID to int (handleWS): %v\n", err)
+		log.Printf("Fail to upgrade the connection (handleWS): %v\n", err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -49,5 +55,7 @@ func handleWS(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 	hubs = make(map[int]*websocket.Hub)
-
+	websocketMux := mux.NewRouter()
+	websocketMux.HandleFunc("/{roomID:[0-9]+}/{userName}", handleWS)
+	log.Fatal(http.ListenAndServe(":8050", websocketMux))
 }

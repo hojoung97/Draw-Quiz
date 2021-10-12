@@ -1,6 +1,4 @@
-/*
-Websocket code
-*/
+/******************* UI Related *******************/
 const welcomeMess = document.getElementById("welcomeMess");
 let userName
 let roomID
@@ -13,10 +11,11 @@ new URLSearchParams(window.location.search).forEach((value, name) => {
 });
 welcomeMess.append(`Room #${roomID}: Welcome ${userName}!`)
 
-let socket = new WebSocket(`ws://localhost:8080/room/${roomID}/${userName}`);
+/******************* Websocket code *******************/
+let socket = new WebSocket(`ws://localhost:8050/${roomID}/${userName}`);
 
 socket.onopen = () => {
-    console.log("Connected to Server");
+    console.log("Connected to Websocket Server");
 };
 
 socket.onmessage = (msg) => {
@@ -38,11 +37,11 @@ socket.onclose = (event) => {
 
 socket.onerror = (error) => {
     console.log("Socket Error: ", error);
+    window.alert("Room is full! Redirecting to lobby...");
+    window.location.replace("/");
 };
 
-/*
-Canvas Code
-*/
+/******************* Canvas Code *******************/
 let isDrawing = false;
 let x = 0;
 let y = 0;

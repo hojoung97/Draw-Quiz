@@ -32,5 +32,5 @@ func main() {
 
 	// TODO: Make port as a configurable parameter
 	log.Printf("Draw App Web Server Listening on localhost%s\n", port)
-	http.ListenAndServe(port, webServerMux)
+	log.Fatal(http.ListenAndServe(port, webServerMux))
 }
