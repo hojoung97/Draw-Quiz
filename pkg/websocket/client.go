@@ -8,6 +8,7 @@ import (
 
 type Client struct {
 	ID   string
+	Name string
 	Conn *websocket.Conn
 	Hub  *Hub
 }

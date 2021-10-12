@@ -34,15 +34,21 @@ func (hub *Hub) Start() {
 		select {
 		case client := <-hub.Register:
 			hub.Clients[client] = true
-			log.Printf("New Client %s joined room %d (size=%d)\n", client.ID, hub.RoomID, len(hub.Clients))
-			for client := range hub.Clients {
-				client.Conn.WriteJSON(Message{Type: 1, Body: fmt.Sprintf("New User %s Joined", client.ID)})
+			log.Printf("New Client %s joined room %d (size=%d)\n", client.Name, hub.RoomID, len(hub.Clients))
+			for peerClient := range hub.Clients {
+				if client.Name == peerClient.Name {
+					continue
+				}
+				peerClient.Conn.WriteJSON(Message{Type: 1, Body: fmt.Sprintf("New User %s Joined", client.Name)})
 			}
 		case client := <-hub.Unregister:
 			delete(hub.Clients, client)
 			log.Printf("New Client %s left room %d (size=%d)\n", client.ID, hub.RoomID, len(hub.Clients))
-			for client := range hub.Clients {
-				client.Conn.WriteJSON(Message{Type: 1, Body: fmt.Sprintf("User %s Disconnected", client.ID)})
+			for peerClient := range hub.Clients {
+				if client.Name == peerClient.Name {
+					continue
+				}
+				peerClient.Conn.WriteJSON(Message{Type: 1, Body: fmt.Sprintf("User %s Disconnected", client.ID)})
 			}
 		case message := <-hub.Broadcast:
 			// log.Printf("Sending message to all clients in hub %d\n", hub.RoomID)

@@ -27,7 +27,9 @@ func handleWS(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	roomID, err := strconv.Atoi(mux.Vars(r)["roomID"])
+	vars := mux.Vars(r)
+
+	roomID, err := strconv.Atoi(vars["roomID"])
 	if err != nil {
 		log.Printf("Fail to convert the roomID to int (handleWS): %v\n", err)
 		w.WriteHeader(http.StatusInternalServerError)
@@ -35,6 +37,7 @@ func handleWS(w http.ResponseWriter, r *http.Request) {
 	}
 
 	client := &websocket.Client{
+		Name: vars["userName"],
 		Conn: conn,
 		Hub:  hubs[roomID],
 	}
@@ -66,7 +69,7 @@ func main() {
 	webServerMux := mux.NewRouter()
 
 	webServerMux.HandleFunc("/room", handleRoom).Methods("GET")
-	webServerMux.HandleFunc("/room/{roomID:[0-9]+}", handleWS)
+	webServerMux.HandleFunc("/room/{roomID:[0-9]+}/{userName}", handleWS)
 	webServerMux.PathPrefix("/").Handler(http.FileServer(http.Dir("./static")))
 
 	// TODO: Make port as a configurable parameter

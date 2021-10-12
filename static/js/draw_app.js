@@ -13,7 +13,7 @@ new URLSearchParams(window.location.search).forEach((value, name) => {
 });
 welcomeMess.append(`Room #${roomID}: Welcome ${userName}!`)
 
-let socket = new WebSocket(`ws://localhost:8080/room/${roomID}`);
+let socket = new WebSocket(`ws://localhost:8080/room/${roomID}/${userName}`);
 
 socket.onopen = () => {
     console.log("Connected to Server");
