@@ -25,7 +25,7 @@ func main() {
 	webServerMux := mux.NewRouter()
 
 	webServerMux.HandleFunc("/room", handleRoom).Methods("GET")
-	webServerMux.PathPrefix("/").Handler(http.FileServer(http.Dir("./static")))
+	webServerMux.PathPrefix("/").Handler(http.FileServer(http.Dir("static")))
 
 	// TODO: Make port as a configurable parameter
 	log.Printf("Draw App Web Server Listening on localhost%s\n", ":8080")

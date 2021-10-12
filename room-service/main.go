@@ -6,7 +6,7 @@ import (
 	"strconv"
 
 	"github.com/gorilla/mux"
-	"github.com/hojoung97/Draw-Quiz/websocket/pkg/websocket"
+	"github.com/hojoung97/draw-quiz/room-service/websocket"
 )
 
 var hubs map[int]*websocket.Hub
