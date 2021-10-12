@@ -6,7 +6,7 @@ import (
 	"strconv"
 
 	"github.com/gorilla/mux"
-	"github.com/hojoung97/Draw-Quiz/pkg/websocket"
+	"github.com/hojoung97/Draw-Quiz/websocket/pkg/websocket"
 )
 
 var hubs map[int]*websocket.Hub
@@ -47,32 +47,7 @@ func handleWS(w http.ResponseWriter, r *http.Request) {
 	client.Read()
 }
 
-func handleRoom(w http.ResponseWriter, r *http.Request) {
-	query := r.URL.Query()
-	roomID, err := strconv.Atoi(query.Get("roomID"))
-	if err != nil {
-		log.Printf("Fail to convert the roomID to int (handleRoom): %v\n", err)
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-
-	// TODO: set maximum capacity per room
-	if hub, ok := hubs[roomID]; !ok || hub == nil {
-		setupWS(roomID)
-	}
-	http.ServeFile(w, r, "static/draw_app.html")
-}
-
 func main() {
 	hubs = make(map[int]*websocket.Hub)
 
-	webServerMux := mux.NewRouter()
-
-	webServerMux.HandleFunc("/room", handleRoom).Methods("GET")
-	webServerMux.HandleFunc("/room/{roomID:[0-9]+}/{userName}", handleWS)
-	webServerMux.PathPrefix("/").Handler(http.FileServer(http.Dir("./static")))
-
-	// TODO: Make port as a configurable parameter
-	log.Printf("Draw App Web Server Listening on localhost%s\n", ":8080")
-	http.ListenAndServe(":8080", webServerMux)
 }
