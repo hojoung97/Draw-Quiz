@@ -1,8 +1,10 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"strconv"
 
 	"github.com/gorilla/mux"
@@ -22,12 +24,13 @@ func handleRoom(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
+	port := fmt.Sprintf(":%s", os.Getenv("PORT"))
 	webServerMux := mux.NewRouter()
 
 	webServerMux.HandleFunc("/room", handleRoom).Methods("GET")
-	webServerMux.PathPrefix("/").Handler(http.FileServer(http.Dir("static")))
+	webServerMux.PathPrefix("/").Handler(http.FileServer(http.Dir("./static")))
 
 	// TODO: Make port as a configurable parameter
-	log.Printf("Draw App Web Server Listening on localhost%s\n", ":8080")
-	http.ListenAndServe(":8080", webServerMux)
+	log.Printf("Draw App Web Server Listening on localhost%s\n", port)
+	http.ListenAndServe(port, webServerMux)
 }
