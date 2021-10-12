@@ -11,7 +11,7 @@ new URLSearchParams(window.location.search).forEach((value, name) => {
         roomID = value
     }
 });
-welcomeMess.append(`Welcome to room ${roomID} ${userName}!`)
+welcomeMess.append(`Room #${roomID}: Welcome ${userName}!`)
 
 let socket = new WebSocket(`ws://localhost:8080/room/${roomID}`);
 

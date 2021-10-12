@@ -10,36 +10,49 @@
     <link rel="stylesheet" href="css/draw_app.css">
 </head>
 
-<h2 id="welcomeMess"></h2> 
-<h1>Draw Your Object</h1>
+<h1 class="title">Draw Quiz</h1>
 
-<div class="selectionBox">
-    <header class="selectionBoxHeader">
-        <div class="title">Choose Object to Draw</div>
-    </header>
-    <section>
-        <div class="optionList">
-            <div class="option">
-                <span>option1</span>
-            </div>
-            <div class="option">
-                <span>option1</span>
-            </div>
-            <div class="option">
-                <span>option1</span>
-            </div>
-            <div class="option">
-                <span>option1</span>
+<div class="mainContent">
+    <div>
+        <canvas id="myCanvas" width="700" height="700"></canvas>
+    </div>
+
+    <div class="menus">
+        <div class="roomLogBox">
+            <header class="roomLogBoxHeader">
+                <div class="title" id="welcomeMess"></div>
+            </header>
+            <div class="roomLog">
             </div>
         </div>
-    </section>
-    <footer>
-        <button class="selectionButton">Start</button>
-    </footer>
+
+        <div class="selectionBox">
+            <header class="selectionBoxHeader">
+                <div class="title">Choose Object to Draw</div>
+            </header>
+            <section>
+                <div class="optionList">
+                    <div class="option">
+                        <span>option1</span>
+                    </div>
+                    <div class="option">
+                        <span>option1</span>
+                    </div>
+                    <div class="option">
+                        <span>option1</span>
+                    </div>
+                    <div class="option">
+                        <span>option1</span>
+                    </div>
+                </div>
+            </section>
+            <footer>
+                <button class="selectionButton">Start</button>
+            </footer>
+        </div>
+    </div>
 </div>
 
-
-<canvas id="myCanvas" width="700" height="700"></canvas>
 <div>
     <label for="brushPalette">Brush Color</label>
     <input type="color" id="brushPalette" value="#000000">
@@ -53,11 +66,10 @@
 <div>
     <button type="button" id="clearButton">Clear</button>
     <button type="button" id="submitButton">Send</button>
-</div>
-
-<a href="/">
+    <a href="/">
     <button>Back to Lobby</button>
-</a>
+    </a>
+</div>
 
 <script src="js/draw_app.js"></script>
 
