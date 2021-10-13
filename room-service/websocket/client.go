@@ -31,8 +31,7 @@ func (c *Client) Read() {
 			return
 		}
 		message := Message{Type: messageType, Body: string(p)}
-		// c.Hub.Broadcast <- message
-		//log.Printf("Message Received: %+v\n", message)
+
 		for client := range c.Hub.Clients {
 			if c == client {
 				continue

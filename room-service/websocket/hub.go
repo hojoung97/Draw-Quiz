@@ -33,31 +33,27 @@ func (hub *Hub) Start() {
 	for {
 		select {
 		case client := <-hub.Register:
-			hub.Clients[client] = true
 			log.Printf("New Client %s joined room %d (size=%d)\n", client.Name, hub.RoomID, len(hub.Clients))
-			for peerClient := range hub.Clients {
-				if client.Name == peerClient.Name {
-					continue
+			for c := range hub.Clients {
+				err := c.Conn.WriteJSON(Message{Type: 1, Body: fmt.Sprintf("New User %s Joined", client.Name)})
+				if err != nil {
+					log.Printf("Fail in hub %d WriteJSON to user %s: %v\n", c.Hub.RoomID, c.ID, err)
 				}
-				if len(hub.Clients) == 2 {
-					peerClient.Conn.WriteJSON(Message{Type: 1, Body: "choose"})
+
+				err = c.Conn.WriteJSON(Message{Type: 1, Body: "choose"})
+				if err != nil {
+					log.Printf("Fail in hub %d WriteJSON to user %s: %v\n", c.Hub.RoomID, c.ID, err)
 				}
-				peerClient.Conn.WriteJSON(Message{Type: 1, Body: fmt.Sprintf("New User %s Joined", client.Name)})
 			}
+			hub.Clients[client] = true
+
 		case client := <-hub.Unregister:
-			delete(hub.Clients, client)
 			log.Printf("New Client %s left room %d (size=%d)\n", client.ID, hub.RoomID, len(hub.Clients))
-			for peerClient := range hub.Clients {
-				if client.Name == peerClient.Name {
-					continue
-				}
-				peerClient.Conn.WriteJSON(Message{Type: 1, Body: fmt.Sprintf("User %s Disconnected", client.ID)})
-			}
-		case message := <-hub.Broadcast:
-			// log.Printf("Sending message to all clients in hub %d\n", hub.RoomID)
-			for client := range hub.Clients {
-				if err := client.Conn.WriteJSON(message); err != nil {
-					log.Printf("Fail in hub %d broadcast to user %s: %v\n", hub.RoomID, client.ID, err)
+			delete(hub.Clients, client)
+			for c := range hub.Clients {
+				err := c.Conn.WriteJSON(Message{Type: 1, Body: fmt.Sprintf("User %s Disconnected", client.ID)})
+				if err != nil {
+					log.Printf("Fail in hub %d WriteJSON to user %s: %v\n", c.Hub.RoomID, c.ID, err)
 				}
 			}
 		}

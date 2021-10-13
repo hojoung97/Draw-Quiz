@@ -57,5 +57,6 @@ func main() {
 	hubs = make(map[int]*websocket.Hub)
 	websocketMux := mux.NewRouter()
 	websocketMux.HandleFunc("/{roomID:[0-9]+}/{userName}", handleWS)
+	log.Printf("Listening Websocket connections on localhost:8050\n")
 	log.Fatal(http.ListenAndServe(":8050", websocketMux))
 }
