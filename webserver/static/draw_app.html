@@ -13,16 +13,37 @@
 <h1 class="title">Draw Quiz</h1>
 
 <div class="mainContent">
-    <div>
+    <div class="drawBox">
         <canvas id="myCanvas" width="700" height="700"></canvas>
+
+        <div class="menus">
+            <div>
+                <label for="brushPalette">Brush Color</label>
+                <input type="color" id="brushPalette" value="#000000">
+            </div>
+
+            <div>
+                <label for="brushSlider">Brush Size</label>
+                <input type="range" min="1" max="50" value="5" id="brushSlider">
+            </div>
+
+            <div>
+                <button type="button" id="clearButton">Clear</button>
+                <button type="button" id="submitButton">Send</button>
+                <a href="/">
+                    <button>Back to Lobby</button>
+                </a>
+            </div>
+        </div>
     </div>
 
-    <div class="menus">
+    <div class="boxes">
         <div class="roomLogBox">
             <header class="roomLogBoxHeader">
                 <div class="title" id="welcomeMess"></div>
             </header>
-            <div class="roomLog">
+            <div class="roomLog" id="roomLog">
+            Waiting for a friend to join...
             </div>
         </div>
 
@@ -32,17 +53,17 @@
             </header>
             <section>
                 <div class="optionList">
-                    <div class="option">
-                        <span>option1</span>
+                    <div class="option" id="option1">
+                        <span>-</span>
                     </div>
-                    <div class="option">
-                        <span>option1</span>
+                    <div class="option" id="option2">
+                        <span>-</span>
                     </div>
-                    <div class="option">
-                        <span>option1</span>
+                    <div class="option" id="option3">
+                        <span>-</span>
                     </div>
-                    <div class="option">
-                        <span>option1</span>
+                    <div class="option" id="option4">
+                        <span>-</span>
                     </div>
                 </div>
             </section>
@@ -53,24 +74,7 @@
     </div>
 </div>
 
-<div>
-    <label for="brushPalette">Brush Color</label>
-    <input type="color" id="brushPalette" value="#000000">
-</div>
-
-<div>
-    <label for="brushSlider">Brush Size</label>
-    <input type="range" min="1" max="50" value="5" id="brushSlider">
-</div>
-
-<div>
-    <button type="button" id="clearButton">Clear</button>
-    <button type="button" id="submitButton">Send</button>
-    <a href="/">
-        <button>Back to Lobby</button>
-    </a>
-</div>
-
 <script src="js/draw_app.js"></script>
+<script src="js/items.js"></script>
 
 </html>

@@ -39,6 +39,9 @@ func (hub *Hub) Start() {
 				if client.Name == peerClient.Name {
 					continue
 				}
+				if len(hub.Clients) == 2 {
+					peerClient.Conn.WriteJSON(Message{Type: 1, Body: "choose"})
+				}
 				peerClient.Conn.WriteJSON(Message{Type: 1, Body: fmt.Sprintf("New User %s Joined", client.Name)})
 			}
 		case client := <-hub.Unregister:

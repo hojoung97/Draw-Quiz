@@ -31,7 +31,15 @@ func (c *Client) Read() {
 			return
 		}
 		message := Message{Type: messageType, Body: string(p)}
-		c.Hub.Broadcast <- message
+		// c.Hub.Broadcast <- message
 		//log.Printf("Message Received: %+v\n", message)
+		for client := range c.Hub.Clients {
+			if c == client {
+				continue
+			}
+			if err := client.Conn.WriteJSON(message); err != nil {
+				log.Printf("Fail in hub %d broadcast to user %s: %v\n", c.Hub.RoomID, client.ID, err)
+			}
+		}
 	}
 }

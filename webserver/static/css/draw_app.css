@@ -45,6 +45,23 @@ button{
     flex-direction: row;
 }
 
+.drawBox.activeDraw,
+.roomLogBox.activeRoomLog,
+.selectionBox.activeSelection{
+    z-index: 5;
+    opacity: 1;
+    pointer-events: auto;
+    transform: translate(-50%, -50%) scale(1);
+}
+
+/*
+.drawBox{
+    opacity: 0;
+    pointer-events: none;
+    transform: translate(-50%, -50%) scale(0.9);
+}
+*/
+
 .roomLogBox{
     width: 550px;
     height:300px;

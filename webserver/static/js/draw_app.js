@@ -11,6 +11,30 @@ new URLSearchParams(window.location.search).forEach((value, name) => {
 });
 welcomeMess.append(`Room #${roomID}: Welcome ${userName}!`)
 
+const drawBox = document.querySelector(".drawBox");
+const roomLogBox = document.querySelector(".roomLogBox");
+const selectionBox = document.querySelector(".selectionBox");
+
+const roomLog = document.getElementById("roomLog");
+
+function pickItems() {
+    options = [];
+    for (let i=0; i < 4; i++) {
+        options.push(document.getElementById(`option${i+1}`));
+    }
+
+    items = shuffle(items);
+    for (let i=0; i < options.length; i++) {
+        options[i].innerHTML = items[i];
+        options[i].setAttribute("onclick", "optionSelected(this)");
+    }
+}
+
+function optionSelected(option) {
+    let item = option.textContent;
+    console.log(item);
+}
+
 /******************* Websocket code *******************/
 let socket = new WebSocket(`ws://localhost:8050/${roomID}/${userName}`);
 
@@ -20,8 +44,18 @@ socket.onopen = () => {
 
 socket.onmessage = (msg) => {
     let data = JSON.parse(msg.data);
+
     if (data.type == 1) {
         console.log(data.body)
+
+        if (data.body == "choose") {
+            roomLog.innerHTML = "Ready to begin! Choose an object below.";
+            pickItems();
+            socket.send("wait");
+        } else if (data.body == "wait") {
+            roomLog.innerHTML = "Friend is choosing something to draw";
+        }
+
     } else if (data.type == 2) {
         let image = new Image();
         image.onload = function() {
@@ -37,8 +71,8 @@ socket.onclose = (event) => {
 
 socket.onerror = (error) => {
     console.log("Socket Error: ", error);
-    window.alert("Room is full! Redirecting to lobby...");
-    window.location.replace("/");
+    //window.alert("Room is full! Redirecting to lobby...");
+    //window.location.replace("/");
 };
 
 /******************* Canvas Code *******************/
