@@ -121,7 +121,14 @@ section .optionList .option:hover{
     border-color: #b8daff;
 }
 
-footer .selectionButton{
+section .optionList .option.chosen{
+    color: #155724;
+    background: #d4edda;
+    border-color: #c3e6cb;
+}
+
+.selectionBox .selectionButton,
+.selectionBox .ansButton{
     height: 40px;
     padding: 0 13px;
     font-size: 18px;
@@ -137,6 +144,7 @@ footer .selectionButton{
     float: right;
 }
 
-footer .selectionButton:hover{
+.selectionBox .selectionButton:hover,
+.selectionBox .ansButton:hover{
     background: #0263ca;
 }

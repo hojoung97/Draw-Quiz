@@ -29,7 +29,7 @@
 
             <div>
                 <button type="button" id="clearButton">Clear</button>
-                <button type="button" id="submitButton">Send</button>
+                <button type="button" id="submitButton">Done</button>
                 <a href="/">
                     <button>Back to Lobby</button>
                 </a>
@@ -48,9 +48,6 @@
         </div>
 
         <div class="selectionBox">
-            <header class="selectionBoxHeader">
-                <div class="title">Choose Object to Draw</div>
-            </header>
             <section>
                 <div class="optionList">
                     <div class="option" id="option1">
@@ -67,9 +64,8 @@
                     </div>
                 </div>
             </section>
-            <footer>
-                <button class="selectionButton">Start</button>
-            </footer>
+            <button class="selectionButton" id="selectionButton" style="visibility:hidden;">Submit</button>
+            <button class="ansButton" id="ansButton" style="visibility:hidden;">Submit</button>
         </div>
     </div>
 </div>

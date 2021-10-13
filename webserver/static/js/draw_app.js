@@ -1,5 +1,4 @@
-/******************* UI Related *******************/
-const welcomeMess = document.getElementById("welcomeMess");
+/******************* Room Arguments *******************/
 let userName
 let roomID
 new URLSearchParams(window.location.search).forEach((value, name) => {
@@ -9,31 +8,6 @@ new URLSearchParams(window.location.search).forEach((value, name) => {
         roomID = value
     }
 });
-welcomeMess.append(`Room #${roomID}: Welcome ${userName}!`)
-
-const drawBox = document.querySelector(".drawBox");
-const roomLogBox = document.querySelector(".roomLogBox");
-const selectionBox = document.querySelector(".selectionBox");
-
-const roomLog = document.getElementById("roomLog");
-
-function pickItems() {
-    options = [];
-    for (let i=0; i < 4; i++) {
-        options.push(document.getElementById(`option${i+1}`));
-    }
-
-    items = shuffle(items);
-    for (let i=0; i < options.length; i++) {
-        options[i].innerHTML = items[i];
-        options[i].setAttribute("onclick", "optionSelected(this)");
-    }
-}
-
-function optionSelected(option) {
-    let item = option.textContent;
-    console.log(item);
-}
 
 /******************* Websocket code *******************/
 let socket = new WebSocket(`ws://localhost:8050/${roomID}/${userName}`);
@@ -48,12 +22,36 @@ socket.onmessage = (msg) => {
     if (data.type == 1) {
         console.log(data.body)
 
-        if (data.body == "choose") {
+        s = data.body.split(";");
+
+        if (s[0] == "choose") {
             roomLog.innerHTML = "Ready to begin! Choose an object below.";
             pickItems();
             socket.send("wait");
-        } else if (data.body == "wait") {
+        } else if (s[0] == "wait") {
             roomLog.innerHTML = "Friend is choosing something to draw";
+        } else if (s[0] == "drawing") {
+            roomLog.innerHTML = "Friend is drawing the object";
+        } else if (s[0] == "done") {
+            roomLog.innerHTML = "Can you guess the object?";
+            for (let i=0; i < 4; i++) {
+                document.getElementById(`option${i+1}`).innerHTML = s[i+1];
+            }
+            guessItems();
+        } else if (s[0] == "correct0") {
+            window.alert("You got it right!");
+            roomLog.innerHTML = "Ready to begin! Choose an object below.";
+            pickItems();
+            socket.send("wait");
+        } else if (s[0] == "correct1") {
+            window.alert("Your friend got it right!");
+        } else if (s[0] == "wrong0") {
+            window.alert("You got it wrong :(");
+            roomLog.innerHTML = "Ready to begin! Choose an object below.";
+            pickItems();
+            socket.send("wait");
+        } else if (s[0] == "wrong1") {
+            window.alert("Your friend got in wrong :(");
         }
 
     } else if (data.type == 2) {
@@ -71,9 +69,71 @@ socket.onclose = (event) => {
 
 socket.onerror = (error) => {
     console.log("Socket Error: ", error);
-    //window.alert("Room is full! Redirecting to lobby...");
-    //window.location.replace("/");
+    window.alert("Room is full! Redirecting to lobby...");
+    window.location.replace("/");
 };
+
+/******************* UI Related *******************/
+const welcomeMess = document.getElementById("welcomeMess");
+welcomeMess.append(`Room #${roomID}: Welcome ${userName}!`)
+
+const drawBox = document.querySelector(".drawBox");
+const roomLogBox = document.querySelector(".roomLogBox");
+const selectionBox = document.querySelector(".selectionBox");
+
+const roomLog = document.getElementById("roomLog");
+const selectionButton = document.getElementById("selectionButton");
+const ansButton = document.getElementById("ansButton");
+
+function pickItems() {
+    options = [];
+    for (let i=0; i < 4; i++) {
+        options.push(document.getElementById(`option${i+1}`));
+    }
+
+    items = shuffle(items);
+    for (let i=0; i < options.length; i++) {
+        options[i].innerHTML = items[i];
+        options[i].setAttribute("onclick", "optionSelected(this, options, selectionButton)");
+    }
+
+    let opts = `option;${items[0]};${items[1]};${items[2]};${items[3]}`;
+    socket.send(opts);
+}
+
+function guessItems() {
+    options = [];
+    for (let i=0; i < 4; i++) {
+        options.push(document.getElementById(`option${i+1}`));
+    }
+
+    for (let i=0; i < 4; i++) {
+        options[i].setAttribute("onclick", "optionSelected(this, options, ansButton)");
+    }
+}
+
+let selectedItem;
+function optionSelected(option, options, button) {
+    for (let i=0; i < options.length; i++) {
+        options[i].classList.remove("chosen");
+    }
+
+    selectedItem = option.textContent;
+    console.log(selectedItem);
+    option.classList.add("chosen");
+    button.style.visibility = "visible";
+}
+
+selectionButton.addEventListener("click", e => {
+    socket.send(`drawing;${selectedItem}`);
+    roomLog.innerHTML = `You chose ${selectedItem}. Start drawing!`;
+    selectionButton.style.visibility = "hidden";
+});
+
+ansButton.addEventListener("click", e => {
+    socket.send(`answer;${selectedItem}`);
+    ansButton.style.visibility = "hidden";
+});
 
 /******************* Canvas Code *******************/
 let isDrawing = false;
@@ -121,9 +181,7 @@ clearButton.addEventListener("click", e => {
 });
 
 submitButton.addEventListener("click", e => {
-    let drawing = canvas.toDataURL("image/jpeg");
-    let enc = new TextEncoder()
-    socket.send(enc.encode(drawing));
+    socket.send("done");
 });
 
 function broadcastDrawing() {

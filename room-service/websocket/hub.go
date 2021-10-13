@@ -11,6 +11,8 @@ type Hub struct {
 	Broadcast  chan Message
 	Register   chan *Client
 	Unregister chan *Client
+	Object     string
+	Options    string
 }
 
 func NewHub(roomID int) *Hub {
