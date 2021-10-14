@@ -9,6 +9,23 @@ new URLSearchParams(window.location.search).forEach((value, name) => {
     }
 });
 
+/******************* HTML Elements *******************/
+const drawBox = document.querySelector(".drawBox");
+const roomLogBox = document.querySelector(".roomLogBox");
+const selectionBox = document.querySelector(".selectionBox");
+
+const welcomeMess = document.getElementById("welcomeMess");
+const roomLog = document.getElementById("roomLog");
+const selectionButton = document.getElementById("selectionButton");
+const ansButton = document.getElementById("ansButton");
+
+const canvas = document.getElementById("myCanvas");
+const context = canvas.getContext("2d");
+const brushPalette = document.getElementById("brushPalette");
+const brushSlider = document.getElementById("brushSlider");
+const clearButton = document.getElementById("clearButton");
+const submitButton = document.getElementById("submitButton");
+
 /******************* Websocket code *******************/
 let socket = new WebSocket(`ws://localhost:8050/${roomID}/${userName}`);
 
@@ -41,16 +58,28 @@ socket.onmessage = (msg) => {
         } else if (s[0] == "correct0") {
             window.alert("You got it right!");
             roomLog.innerHTML = "Ready to begin! Choose an object below.";
+            resetOptionSelection();
+            resetOptionText();
+            resetCanvas();
             pickItems();
             socket.send("wait");
         } else if (s[0] == "correct1") {
+            resetOptionSelection();
+            resetOptionText();
+            resetCanvas();
             window.alert("Your friend got it right!");
         } else if (s[0] == "wrong0") {
             window.alert("You got it wrong :(");
             roomLog.innerHTML = "Ready to begin! Choose an object below.";
+            resetOptionSelection();
+            resetOptionText();
+            resetCanvas();
             pickItems();
             socket.send("wait");
         } else if (s[0] == "wrong1") {
+            resetOptionSelection();
+            resetOptionText();
+            resetCanvas();
             window.alert("Your friend got in wrong :(");
         }
 
@@ -74,16 +103,31 @@ socket.onerror = (error) => {
 };
 
 /******************* UI Related *******************/
-const welcomeMess = document.getElementById("welcomeMess");
 welcomeMess.append(`Room #${roomID}: Welcome ${userName}!`)
 
-const drawBox = document.querySelector(".drawBox");
-const roomLogBox = document.querySelector(".roomLogBox");
-const selectionBox = document.querySelector(".selectionBox");
+function enableDrawingElements() {
+    canvas.style.pointerEvents = "auto";
+    clearButton.style.pointerEvents = "auto";
+    submitButton.style.pointerEvents = "auto";
+}
 
-const roomLog = document.getElementById("roomLog");
-const selectionButton = document.getElementById("selectionButton");
-const ansButton = document.getElementById("ansButton");
+function disableDrawingElements() {
+    canvas.style.pointerEvents = "none";
+    clearButton.style.pointerEvents = "none";
+    submitButton.style.pointerEvents = "none";
+}
+
+function resetOptionSelection() {
+    for (let i=0; i < options.length; i++) {
+        document.getElementById(`option${i+1}`).classList.remove("chosen");
+    }
+}
+
+function resetOptionText() {
+    for (let i=0; i < options.length; i++) {
+        document.getElementById(`option${i+1}`).innerHTML = "-";
+    }
+}
 
 function pickItems() {
     options = [];
@@ -94,7 +138,7 @@ function pickItems() {
     items = shuffle(items);
     for (let i=0; i < options.length; i++) {
         options[i].innerHTML = items[i];
-        options[i].setAttribute("onclick", "optionSelected(this, options, selectionButton)");
+        options[i].setAttribute("onclick", "optionSelected(this, selectionButton)");
     }
 
     let opts = `option;${items[0]};${items[1]};${items[2]};${items[3]}`;
@@ -108,16 +152,13 @@ function guessItems() {
     }
 
     for (let i=0; i < 4; i++) {
-        options[i].setAttribute("onclick", "optionSelected(this, options, ansButton)");
+        options[i].setAttribute("onclick", "optionSelected(this, ansButton)");
     }
 }
 
 let selectedItem;
-function optionSelected(option, options, button) {
-    for (let i=0; i < options.length; i++) {
-        options[i].classList.remove("chosen");
-    }
-
+function optionSelected(option, button) {
+    resetOptionSelection();
     selectedItem = option.textContent;
     console.log(selectedItem);
     option.classList.add("chosen");
@@ -127,7 +168,14 @@ function optionSelected(option, options, button) {
 selectionButton.addEventListener("click", e => {
     socket.send(`drawing;${selectedItem}`);
     roomLog.innerHTML = `You chose ${selectedItem}. Start drawing!`;
+    
     selectionButton.style.visibility = "hidden";
+
+    for (let i=0; i < options.length; i++) {
+        document.getElementById(`option${i+1}`).removeAttribute("onclick");
+    }
+
+    enableDrawingElements();
 });
 
 ansButton.addEventListener("click", e => {
@@ -139,50 +187,6 @@ ansButton.addEventListener("click", e => {
 let isDrawing = false;
 let x = 0;
 let y = 0;
-
-const canvas = document.getElementById("myCanvas");
-const context = canvas.getContext("2d");
-const brushPalette = document.getElementById("brushPalette");
-const brushSlider = document.getElementById("brushSlider");
-const clearButton = document.getElementById("clearButton");
-const submitButton = document.getElementById("submitButton");
-
-context.fillStyle = "white";
-context.fillRect(0, 0, canvas.width, canvas.height);
-
-canvas.addEventListener("mousedown", e => {
-    x = e.offsetX;
-    y = e.offsetY;
-    isDrawing = true;
-});
-
-canvas.addEventListener("mousemove", e => {
-    if (isDrawing === true) {
-        drawLine(x, y, e.offsetX, e.offsetY);
-        x = e.offsetX;
-        y = e.offsetY;
-    }
-});
-
-window.addEventListener("mouseup", e => {
-    if (isDrawing === true) {
-        drawLine(x, y, e.offsetX, e.offsetY);
-        x = 0;
-        y = 0;
-        isDrawing = false;
-        broadcastDrawing();
-    }
-});
-
-clearButton.addEventListener("click", e => {
-    context.fillStyle = "white";
-    context.fillRect(0, 0, canvas.width, canvas.height);
-    broadcastDrawing();
-});
-
-submitButton.addEventListener("click", e => {
-    socket.send("done");
-});
 
 function broadcastDrawing() {
     let drawing = canvas.toDataURL("image/jpeg");
@@ -200,3 +204,44 @@ function drawLine(x1, y1, x2, y2) {
     context.stroke();
     context.closePath();
 }
+
+function resetCanvas() {
+    context.fillStyle = "white";
+    context.fillRect(0, 0, canvas.width, canvas.height);
+}
+
+resetCanvas();
+
+canvas.addEventListener("mousedown", e => {
+    x = e.offsetX;
+    y = e.offsetY;
+    isDrawing = true;
+});
+
+canvas.addEventListener("mousemove", e => {
+    if (isDrawing === true) {
+        drawLine(x, y, e.offsetX, e.offsetY);
+        x = e.offsetX;
+        y = e.offsetY;
+    }
+});
+
+canvas.addEventListener("mouseup", e => {
+    if (isDrawing === true) {
+        drawLine(x, y, e.offsetX, e.offsetY);
+        x = 0;
+        y = 0;
+        isDrawing = false;
+        broadcastDrawing();
+    }
+});
+
+clearButton.addEventListener("click", e => {
+    resetCanvas();
+    broadcastDrawing();
+});
+
+submitButton.addEventListener("click", e => {
+    socket.send("done");
+    disableDrawingElements();
+});

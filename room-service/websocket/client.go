@@ -38,16 +38,21 @@ func (c *Client) Read() {
 				s := strings.Split(message.Body, ";")
 				c.Hub.Object = s[len(s)-1]
 				message.Body = "drawing"
+
 			} else if strings.HasPrefix(message.Body, "option") {
 				c.Hub.Options = message.Body[len("option"):]
 				message.Body = "saving"
+
 			} else if message.Body == "done" {
 				message.Body += c.Hub.Options
+
 			} else if strings.HasPrefix(message.Body, "answer") {
 				s := strings.Split(message.Body, ";")
+
 				if c.Hub.Object == s[len(s)-1] {
 					c.Conn.WriteJSON(Message{Type: 1, Body: "correct0"})
 					message.Body = "correct1"
+
 				} else {
 					c.Conn.WriteJSON(Message{Type: 1, Body: "wrong0"})
 					message.Body = "wrong1"
