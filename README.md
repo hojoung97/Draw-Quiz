@@ -1,6 +1,14 @@
 # Draw-Quiz
 Draw Quiz Web App
 
+## Requirements for Running the App
+
+### Running Locally
+`go 1.16` or higher
+
+### Running on Docker
+[`docker`](https://docs.docker.com/get-docker/)
+
 ## Frontend
 Drawing quiz game as a web application 
 
