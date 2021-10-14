@@ -1,4 +1,4 @@
-FROM golang:alpine AS builder
+FROM golang:latest AS builder
 WORKDIR /build
 COPY go.mod ./
 COPY go.sum ./
@@ -10,6 +10,4 @@ RUN go build -o webserver
 FROM alpine
 COPY --from=builder /build/webserver ./
 ADD webserver/static ./static
-ENV PORT=8000
-EXPOSE 8000
 ENTRYPOINT ["/webserver"]
