@@ -37,8 +37,6 @@ socket.onmessage = (msg) => {
     let data = JSON.parse(msg.data);
 
     if (data.type == 1) {
-        console.log(data.body)
-
         s = data.body.split(";");
 
         if (s[0] == "choose") {
@@ -160,7 +158,6 @@ let selectedItem;
 function optionSelected(option, button) {
     resetOptionSelection();
     selectedItem = option.textContent;
-    console.log(selectedItem);
     option.classList.add("chosen");
     button.style.visibility = "visible";
 }

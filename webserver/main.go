@@ -24,7 +24,7 @@ func handleRoom(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	port := fmt.Sprintf(":%s", os.Getenv("PORT"))
+	port := fmt.Sprintf(":%s", os.Getenv("WEBSERVER_PORT"))
 	webServerMux := mux.NewRouter()
 
 	webServerMux.HandleFunc("/room", handleRoom).Methods("GET")

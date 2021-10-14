@@ -1,8 +1,10 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"strconv"
 
 	"github.com/gorilla/mux"
@@ -54,9 +56,12 @@ func handleWS(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
+	port := fmt.Sprintf(":%s", os.Getenv("WEBSOCKET_PORT"))
 	hubs = make(map[int]*websocket.Hub)
+
 	websocketMux := mux.NewRouter()
 	websocketMux.HandleFunc("/{roomID:[0-9]+}/{userName}", handleWS)
-	log.Printf("Listening Websocket connections on localhost:8050\n")
-	log.Fatal(http.ListenAndServe(":8050", websocketMux))
+
+	log.Printf("Listening Websocket connections on localhost%s\n", port)
+	log.Fatal(http.ListenAndServe(port, websocketMux))
 }
